@@ -1,0 +1,96 @@
+1.Your Goal: Require 1 Ether
+Add a payable constructor method that requires a 1 ether deposit.
+
+If at least 1 ether is not sent to the constructor, revert the transaction.
+
+ There are globally available ether units such as ether that you can use instead of having to convert from Wei (1 ether == 1e18). See Ether Units.
+
+ [code solution]
+
+ pragma solidity ^0.8.0;
+
+contract Contract {
+
+    address public owner;
+
+    constructor() payable {
+        require(msg.value >= 1 ether, "Must send at least 1 ether");
+        owner = msg.sender;
+    }
+
+    function withdraw() public {
+        require(msg.sender == owner, "Not owner");
+
+        (bool success, ) = payable(owner).call{value: address(this).balance}("");
+        require(success);
+    }
+}
+
+2. Your Goal: Owner Withdrawal
+Create a public function withdraw that will withdraw all funds from the contract and send them to the deployer of the contract.
+Require that only the deployer of the contract be allowed to call this function. For all other addresses, this function should revert.
+ The deployer of the contract is msg.sender of the constructor.
+
+ [code solution]
+
+ pragma solidity ^0.8.0;
+
+contract Contract {
+
+    address public owner;
+
+    constructor() payable {
+        require(msg.value >= 1 ether, "Must send at least 1 ether");
+        owner = msg.sender;
+    }
+
+    function withdraw() public {
+        require(msg.sender == owner, "Not owner");
+
+        (bool success, ) = payable(owner).call{value: address(this).balance}("");
+        require(success);
+    }
+}
+
+3.Your Goal: Require Owner
+You'll notice that the onlyOwner modifier has been added to each of the configuration functions in this contract. Only problem is, it doesn't currently do anything!
+
+Update the onlyOwner modifier to require that only the owner address can call these functions without reverting.
+
+ Remember to use the _ to indicate where the function body should go!
+
+ [code solution]
+
+ // SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Contract {
+    uint configA;
+    uint configB;
+    uint configC;
+    address owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function setA(uint _configA) public onlyOwner {
+        configA = _configA;
+    }
+
+    function setB(uint _configB) public onlyOwner {
+        configB = _configB;
+    }
+
+    function setC(uint _configC) public onlyOwner {
+        configC = _configC;
+    }
+
+    modifier onlyOwner {
+        // Check if caller is owner
+        require(msg.sender == owner, "Caller is not owner");
+        
+        // Execute the rest of the function body
+        _;
+    }
+}
